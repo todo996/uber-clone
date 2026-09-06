@@ -2,10 +2,10 @@
 
 ## 1. Design direction
 
-The approved concepts define a clean, modern ride-hailing/logistics visual language:
+The production UI must use a clean, modern ride-hailing/logistics visual language suitable for a commercial product:
 
 - light primary surface
-- strong black typography
+- strong black/dark typography
 - green primary action color
 - blue reserved for map/location/supporting states where useful
 - orange for delivery/cargo accents
@@ -16,7 +16,9 @@ The approved concepts define a clean, modern ride-hailing/logistics visual langu
 - clear mode switching between Customer and Driver
 - compact, high-information desktop shell
 
-The production UI should feel closer to a mature transport platform than a generic admin dashboard.
+This file is the UI source of truth. No demo image or static mockup is required for implementation.
+
+All user-facing copy must follow `10_LOCALIZATION_I18N.md`: Vietnamese (`vi`) is primary/default, English (`en`) is mandatory secondary language.
 
 ## 2. Core design tokens
 
@@ -52,6 +54,7 @@ Primary action family: green.
 Requirements:
 
 - Vietnamese diacritics must render cleanly.
+- English text expansion must not clip buttons/cards.
 - Strong numeric hierarchy for price, ETA, distance and earnings.
 - Avoid tiny 10–11 px text on mobile.
 - Body text should remain readable under sunlight/mobile conditions.
@@ -71,7 +74,7 @@ Numeric KPI  22–32 bold
 
 ### Spacing
 
-Use an 4/8-based spacing system:
+Use a 4/8-based spacing system:
 
 ```text
 4, 8, 12, 16, 20, 24, 32, 40
@@ -104,8 +107,9 @@ Characteristics:
 - bottom navigation
 - sticky primary CTA when useful
 - map may occupy 40–65% of viewport depending state
-- bottom sheets for trip details
+- bottom sheets for trip/order details
 - safe-area aware
+- no horizontal overflow at 320 px
 
 ### Tablet
 
@@ -134,21 +138,21 @@ Preferred shell:
 
 Recommended five items:
 
-1. Trang chủ
-2. Chuyến đi
-3. Thanh toán / Ví
-4. Thông báo
-5. Tài khoản
+1. Trang chủ / Home
+2. Chuyến đi / Trips
+3. Thanh toán / Ví / Payments
+4. Thông báo / Notifications
+5. Tài khoản / Account
 
 ### Driver bottom navigation
 
 Recommended five items:
 
-1. Trang chủ
-2. Chuyến mới
-3. Thu nhập
-4. Lịch sử
-5. Hồ sơ
+1. Trang chủ / Home
+2. Chuyến mới / Requests
+3. Thu nhập / Earnings
+4. Lịch sử / History
+5. Hồ sơ / Profile
 
 ### Role switch
 
@@ -159,9 +163,10 @@ Role switching must be reachable from:
 
 Behavior:
 
-- Customer-only account sees “Trở thành tài xế”.
-- Approved driver sees “Chế độ hiện tại” and a switch action.
+- Customer-only account sees `Trở thành tài xế / Become a driver`.
+- Approved driver sees current mode and a switch action.
 - Pending/rejected driver sees verification state instead of direct switch.
+- Switching language or role must not destroy an active trip/order.
 
 ## 5. Screen: Customer Home
 
@@ -175,30 +180,28 @@ Header:
 
 - current city/location
 - profile/avatar
-- optional notifications
+- notifications
 
 Hero:
 
-- strong “Bạn muốn đi đâu hôm nay?” prompt
+- primary destination prompt
 - destination search field
 
 Service grid:
 
-- Đặt xe
-- Xe ghép
-- Giao hàng
-- Hàng liên tỉnh
+- Đặt xe / Ride
+- Xe ghép / Shared ride
+- Giao hàng / Delivery
+- Hàng liên tỉnh / Intercity cargo
 
 Secondary actions:
 
-- Đặt lịch trước
-- Ưu đãi
+- Đặt lịch trước / Schedule
+- Ưu đãi / Offers
+- Lịch sử / History
+- Hỗ trợ / Support
 
-Promotional/informational card:
-
-- shared ride savings or safety information
-
-### States
+States:
 
 - location permission granted
 - permission denied
@@ -206,16 +209,12 @@ Promotional/informational card:
 - loading services
 - offline/no network
 
-Reference: `assets/web-mobile-overview.jpg`.
-
 ## 6. Screen: Standard Ride Booking
-
-### Main structure
 
 Top:
 
 - back
-- title “Đặt xe”
+- title
 - schedule shortcut
 
 Map:
@@ -234,13 +233,11 @@ Bottom content:
 - estimated price
 - estimated arrival
 - payment method
-- immediate/scheduled toggle
+- immediate/scheduled selector
 - optional bid entry
-- primary CTA “Đặt xe ngay” / “Đặt lịch”
+- primary CTA for book now / schedule
 
-### Vehicle card requirements
-
-Show:
+Vehicle card must show:
 
 - vehicle icon/image
 - label
@@ -260,16 +257,19 @@ Display:
 - search timeout
 - cancel action
 
-Do not block navigation unexpectedly. If user leaves the screen, booking state must persist and be recoverable.
+If user leaves the screen, booking state must persist and be recoverable.
 
 ## 8. Screen: Active Customer Ride
 
 Map first.
 
-Top status timeline:
+Status timeline:
 
 ```text
-Đang đến → Đã đến → Đang đi → Hoàn thành
+Đang đến / Arriving
+→ Đã đến / Arrived
+→ Đang đi / In trip
+→ Hoàn thành / Completed
 ```
 
 Bottom sheet:
@@ -285,14 +285,14 @@ Bottom sheet:
 - notes
 - cancel/support depending state
 
-Realtime location should update without full page reload.
+Realtime location updates without full page reload.
 
 ## 9. Screen: Shared Ride Booking
 
-Header tabs:
+Tabs:
 
-- Đi ngay
-- Đặt lịch trước
+- Đi ngay / Now
+- Đặt lịch trước / Schedule
 
 Inputs:
 
@@ -301,7 +301,7 @@ Inputs:
 - date/time if scheduled
 - seat count stepper
 
-Results cards:
+Result cards:
 
 - departure window
 - route
@@ -311,13 +311,9 @@ Results cards:
 - available seats
 - price per seat
 - estimated detour
-- CTA “Đặt ngay”
+- book CTA
 
-If no direct match:
-
-- offer to expand departure window
-- create match request
-- show nearby pickup adjustment option later
+No-match state can offer wider time window or create a matching request.
 
 ## 10. Screen: Active Shared Ride
 
@@ -326,37 +322,35 @@ Map with ordered stops.
 Bottom panel:
 
 - driver
-- your seat count
+- passenger seat count
 - departure/arrival window
 - ordered pickup/drop-off timeline
 - current stop
 - next stop ETA
-- other riders represented only with privacy-safe minimal avatars/initials
+- privacy-safe representation of other riders
 
 Never expose another passenger’s phone or precise private profile information.
 
 ## 11. Screen: Delivery Creation
 
-Header tabs:
+Tabs:
 
-- Giao ngay
-- Đặt lịch
+- Giao ngay / Deliver now
+- Đặt lịch / Schedule
 
-Sections:
-
-### Pickup
+Pickup section:
 
 - pickup address
 - sender name
 - sender phone
 
-### Destination
+Destination section:
 
 - delivery address
 - receiver name
 - receiver phone
 
-### Item
+Item section:
 
 - category
 - weight
@@ -366,7 +360,7 @@ Sections:
 - photos
 - note
 
-### Vehicle
+Vehicle section:
 
 - motorbike
 - car
@@ -375,7 +369,7 @@ Sections:
 Footer:
 
 - estimate
-- CTA “Đặt giao hàng”
+- create delivery CTA
 
 ## 12. Screen: Active Delivery
 
@@ -384,7 +378,10 @@ Map with pickup and delivery markers.
 Timeline:
 
 ```text
-Đã nhận đơn → Đang lấy hàng → Đang giao hàng → Hoàn thành
+Đã nhận đơn / Accepted
+→ Đang lấy hàng / Picking up
+→ Đang giao hàng / Delivering
+→ Hoàn thành / Completed
 ```
 
 Details:
@@ -399,16 +396,14 @@ Details:
 - delivery proof
 - note
 
-Driver actions are described in Driver screens below.
-
 ## 13. Screen: Intercity Cargo — Customer
 
 Tabs:
 
-- Đăng hàng
-- Đơn của tôi
+- Đăng hàng / Post cargo
+- Đơn của tôi / My orders
 
-Form sections:
+Form:
 
 - province/city origin
 - precise pickup
@@ -424,10 +419,10 @@ Form sections:
 - proposed price
 - notes
 
-After posting:
+After posting show:
 
-- show matching state
-- show carrier offers/matches
+- matching state
+- carrier offers/matches
 - vehicle type
 - available capacity
 - route
@@ -436,12 +431,10 @@ After posting:
 
 ## 14. Screen: Driver Dashboard
 
-Reference: `assets/driver-dashboard.jpg`.
-
 Header:
 
 - driver identity
-- rating
+- verification/rating
 - online/offline toggle
 - notifications
 
@@ -450,30 +443,29 @@ KPI cards:
 - trips today
 - earnings today
 - rating
+- online time when available
 
 Map:
 
 - driver live location
-- demand/active area indication where data is available
+- demand/active-area indication only when backed by real data
 
-Service request counters:
+Service counters:
 
-- Đặt xe
-- Xe ghép
-- Giao hàng
-- Hàng liên tỉnh
+- standard rides
+- shared rides
+- deliveries
+- intercity cargo
 
-Upcoming jobs list:
+Upcoming jobs:
 
 - service icon
 - pickup/destination
 - distance/time
 - payout
-- CTA
+- primary action
 
 ## 15. Screen: Driver New Ride Request
-
-Reference: `assets/driver-new-trip.jpg`.
 
 Map:
 
@@ -484,7 +476,7 @@ Map:
 Bottom sheet:
 
 - request countdown
-- customer
+- customer summary
 - rating if enabled
 - pickup
 - destination
@@ -496,26 +488,24 @@ Bottom sheet:
 - decline
 - accept
 
-On accept, request must become locked to that driver through trusted/state-safe logic.
+Accept must lock the request to the driver through safe state-transition logic.
 
 ## 16. Screen: Driver Active Ride
 
-Reference: `assets/driver-active-trip.jpg`.
-
-Map/navigation area:
+Navigation-first map:
 
 - route
 - next maneuver summary
-- destination/pickup marker
-- current speed optionally
+- target marker
+- current driver position
 
-Trip-state control:
+Trip-state CTA sequence:
 
 ```text
-Đang đến
-→ Đã đến
-→ Đã đón khách
-→ Hoàn thành
+Đang đến / Arriving
+→ Đã đến / Arrived
+→ Đã đón khách / Passenger onboard
+→ Hoàn thành / Complete
 ```
 
 Customer card:
@@ -525,30 +515,24 @@ Customer card:
 - note
 - call/message
 
-Primary action is always the next valid state transition only.
+Only the next valid state action should be the primary CTA.
 
 ## 17. Screen: Driver Shared Ride
 
 Driver sees:
 
-- available seats
-- reserved seats
-- total passengers
+- total seats
+- available/reserved seats
+- passenger count
 - ordered stop list
 - current stop
 - next stop
 - detour impact
 - passenger board/no-show actions
 
-The map should mark:
-
-- pickup stops green
-- drop-off stops red
-- current target highlighted
+Map should distinguish pickup, drop-off and current target without relying only on color.
 
 ## 18. Screen: Driver Delivery
-
-Reference: `assets/driver-delivery.jpg`.
 
 Sections:
 
@@ -557,11 +541,11 @@ Sections:
 - order code
 - service
 - item summary
-- sender and receiver
+- sender/receiver
 - photos
 - notes
 
-Actions by state:
+State-constrained actions:
 
 - accept
 - arrived pickup
@@ -575,19 +559,17 @@ Actions by state:
 
 ## 19. Screen: Driver Intercity Cargo Matching
 
-Reference: `assets/driver-intercity-cargo.jpg`.
-
 Header:
 
 - active route
-- vehicle
+- selected vehicle
 - total/remaining payload
 - total/remaining volume
 - departure time
 
 Matching cards:
 
-- cargo photo/category
+- cargo category/photo
 - weight
 - volume
 - origin/destination
@@ -595,17 +577,17 @@ Matching cards:
 - payout
 - detour
 - match score/fit label
-- “Nhận hàng” action
+- accept cargo action
 
-Capacity must refresh immediately after accepting cargo.
+Capacity must refresh immediately and atomically after accepting cargo.
 
 ## 20. Screen: Driver Routes
 
 Tabs:
 
-- Tuyến của tôi
-- Tạo tuyến
-- Đã hoàn thành
+- Tuyến của tôi / My routes
+- Tạo tuyến / Create route
+- Đã hoàn thành / Completed
 
 Create route:
 
@@ -615,17 +597,17 @@ Create route:
 - departure time
 - selected vehicle
 - max detour
-- cargo categories
-- available capacity defaults from vehicle
+- accepted cargo categories
+- available capacity initialized from vehicle
 
 ## 21. Screen: Earnings
 
 Period tabs:
 
-- Hôm nay
-- Tuần này
-- Tháng này
-- Tùy chỉnh
+- Hôm nay / Today
+- Tuần này / This week
+- Tháng này / This month
+- Tùy chỉnh / Custom
 
 KPI:
 
@@ -641,7 +623,7 @@ Breakdown:
 - delivery
 - cargo
 
-Chart is optional but must not replace the numeric breakdown.
+Chart is optional and must not replace numeric breakdown.
 
 ## 22. Screen: Profile / Account
 
@@ -652,6 +634,7 @@ Customer profile:
 - payment
 - trip history
 - notifications
+- language
 - settings
 - help
 - become driver / switch to driver
@@ -665,11 +648,12 @@ Driver profile:
 - service eligibility
 - ratings
 - payout/payment settings
+- language
 - switch to customer
 
 ## 23. Empty/loading/error states
 
-Every major screen must have deliberate states for:
+Every major screen must explicitly support:
 
 - loading
 - no data
@@ -682,6 +666,8 @@ Every major screen must have deliberate states for:
 - expired request
 - cancelled service
 - blocked/suspended account
+
+All states require both Vietnamese and English copy.
 
 ## 24. Motion and feedback
 
@@ -699,7 +685,7 @@ Avoid excessive bounce/glow effects.
 ## 25. Accessibility
 
 - contrast-safe text/buttons
-- labels for icons
+- localized labels for icons
 - keyboard navigation on web
 - focus-visible states
 - reduced-motion support on web
@@ -708,4 +694,6 @@ Avoid excessive bounce/glow effects.
 
 ## 26. Production rule
 
-The concept images contain placeholder names, addresses and amounts. Production implementation must use real authenticated Firebase data and current service/order state only. No hardcoded demo names, drivers, maps, prices or earnings in production screens.
+Production implementation must use real authenticated Firebase data and current service/order state only. No hardcoded demo names, drivers, maps, prices or earnings in production screens.
+
+No demo image is part of the implementation contract. When a UI question arises, use this specification, the product/feature specification, service-flow specification and the actual legacy code behavior as the sources of truth.
