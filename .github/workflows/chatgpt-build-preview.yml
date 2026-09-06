@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  driver-function-screenshots:
+  user-function-screenshots:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -19,16 +19,21 @@ jobs:
           flutter-version: '3.24.5'
           channel: stable
           cache: true
+      - name: Remove unused incompatible dependency
+        run: |
+          sed -i "/rounded_loading_button:/d" uber_users_app/pubspec.yaml
+          sed -i "/package:rounded_loading_button\/rounded_loading_button.dart/d" uber_users_app/lib/authentication/register_screen.dart
+          sed -i "/package:rounded_loading_button\/rounded_loading_button.dart/d" uber_users_app/lib/authentication/user_information_screen.dart
       - name: Dependencies
-        working-directory: uber_drivers_app
+        working-directory: uber_users_app
         run: flutter pub get
-      - name: Build demo APK from real app widgets
-        working-directory: uber_drivers_app
-        run: flutter build apk --debug -t lib/screenshot_main.dart --dart-define=DEMO_MODE=true
+      - name: Build User demo APK from real app widgets
+        working-directory: uber_users_app
+        run: flutter build apk --debug -t lib/screenshot_main.dart
       - name: Enable Android emulator acceleration
         run: |
           if [ -e /dev/kvm ]; then sudo chmod 666 /dev/kvm; fi
-      - name: Capture Home Earnings Trips Profile screens
+      - name: Run User App and capture real screens
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -38,67 +43,28 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: |
             set -x
-            mkdir -p demo-screens logs
+            mkdir -p user-screens logs
             adb wait-for-device
-            adb install -r uber_drivers_app/build/app/outputs/flutter-apk/app-debug.apk
-            adb shell am force-stop com.example.uber_drivers_app
-            adb shell monkey -p com.example.uber_drivers_app -c android.intent.category.LAUNCHER 1
-            sleep 10
-
-            adb exec-out screencap -p > demo-screens/01-home.png
-            adb shell input tap 540 145 || true
-            sleep 2
-            adb exec-out screencap -p > demo-screens/02-go-online-dialog.png
-            adb shell input keyevent 4 || true
-            sleep 1
-
-            adb shell input tap 405 2220 || true
+            adb install -r uber_users_app/build/app/outputs/flutter-apk/app-debug.apk
+            adb shell pm grant com.example.uber_users_app android.permission.ACCESS_FINE_LOCATION || true
+            adb shell pm grant com.example.uber_users_app android.permission.ACCESS_COARSE_LOCATION || true
+            adb shell am force-stop com.example.uber_users_app
+            adb shell monkey -p com.example.uber_users_app -c android.intent.category.LAUNCHER 1
+            sleep 12
+            adb exec-out screencap -p > user-screens/01-user-home.png
+            adb shell input tap 540 2220 || true
             sleep 3
-            adb exec-out screencap -p > demo-screens/03-earnings.png
-
-            adb shell input tap 675 2220 || true
+            adb exec-out screencap -p > user-screens/02-user-profile.png
+            adb shell input tap 900 2220 || true
             sleep 3
-            adb exec-out screencap -p > demo-screens/04-trips.png
-
-            adb shell input tap 945 2220 || true
-            sleep 3
-            adb exec-out screencap -p > demo-screens/05-profile.png
-
-            adb logcat -d -v threadtime > logs/demo-logcat.txt || true
-            adb shell pidof com.example.uber_drivers_app > logs/demo-pid.txt || true
+            adb exec-out screencap -p > user-screens/03-user-about.png
+            adb shell dumpsys activity activities > logs/activity.txt || true
+            adb logcat -d -v threadtime > logs/user-logcat.txt || true
+            adb shell pidof com.example.uber_users_app > logs/user-pid.txt || true
       - uses: actions/upload-artifact@v4
         with:
-          name: driver-demo-full-real-screenshots
+          name: user-app-real-demo-screenshots
           path: |
-            demo-screens/
+            user-screens/
             logs/
           if-no-files-found: error
-
-  user-build-preview:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.5'
-          channel: stable
-          cache: true
-      - name: Remove unused incompatible preview dependency
-        run: |
-          sed -i "/rounded_loading_button:/d" uber_users_app/pubspec.yaml
-          sed -i "/package:rounded_loading_button\/rounded_loading_button.dart/d" uber_users_app/lib/authentication/register_screen.dart
-          sed -i "/package:rounded_loading_button\/rounded_loading_button.dart/d" uber_users_app/lib/authentication/user_information_screen.dart
-      - name: Dependencies
-        working-directory: uber_users_app
-        run: flutter pub get
-      - name: Build debug APK
-        working-directory: uber_users_app
-        run: flutter build apk --debug
-      - uses: actions/upload-artifact@v4
-        with:
-          name: uber_users_app-preview-debug-apk-fixed-branch
-          path: uber_users_app/build/app/outputs/flutter-apk/app-debug.apk
