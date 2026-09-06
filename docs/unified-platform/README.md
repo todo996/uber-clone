@@ -22,7 +22,21 @@ The legacy apps remain in the repository during migration and are treated as the
 - `uber_drivers_app/`
 - `uber_admin_panel/`
 
-## 2. Core services
+## 2. Language policy
+
+The product is bilingual from the first release:
+
+- **Tiếng Việt (`vi`) là ngôn ngữ chính, mặc định và là bản nội dung chuẩn.**
+- **English (`en`) là ngôn ngữ thứ hai bắt buộc.**
+- Web, Android và iOS đều phải hỗ trợ chuyển đổi `Tiếng Việt / English`.
+- Clean install/session mặc định mở bằng Tiếng Việt.
+- Lựa chọn ngôn ngữ được lưu theo tài khoản/thiết bị.
+- Missing translation phải fallback về Tiếng Việt.
+- Không hardcode chuỗi giao diện trực tiếp trong component/widget hoặc business logic.
+- Tất cả button, dialog, trạng thái chuyến, validation, error, notification, onboarding, payment, support và accessibility labels đều phải có cả `vi` và `en`.
+- Chi tiết bắt buộc nằm tại `10_LOCALIZATION_I18N.md`.
+
+## 3. Core services
 
 ### Passenger / Customer
 
@@ -57,7 +71,7 @@ The legacy apps remain in the repository during migration and are treated as the
 - Active-trip navigation and status updates
 - Earnings, history and ratings
 
-## 3. Existing behavior that must be preserved
+## 4. Existing behavior that must be preserved
 
 The current User app already creates standard rides under `tripRequest`, with pickup/drop-off coordinates and addresses, rider identity, fare, bid, vehicle type and status. It then listens to the same request in realtime for driver assignment and state changes.
 
@@ -71,7 +85,9 @@ The current Driver app already:
 
 These behaviors form the compatibility contract for the new web and unified mobile clients.
 
-## 4. Target repository structure
+Machine/business state values remain language-neutral. UI text for those states is resolved through the localization layer.
+
+## 5. Target repository structure
 
 ```text
 uber-clone/
@@ -80,9 +96,9 @@ uber-clone/
 │   └── mobile/                 # Flutter unified Android + iOS app
 │
 ├── packages/
-│   ├── contracts/              # JSON Schema / OpenAPI-style shared contracts
+│   ├── contracts/              # JSON Schema / shared contracts
 │   ├── firebase-rules/         # RTDB / Firestore / Storage rules source
-│   ├── design-tokens/          # UI tokens shared conceptually across clients
+│   ├── design-tokens/          # cross-client design tokens
 │   └── fixtures/               # test-only fixtures; never production mock data
 │
 ├── firebase/
@@ -101,7 +117,7 @@ uber-clone/
 
 Do not delete or restructure the legacy apps until the new clients pass compatibility tests.
 
-## 5. Documentation map
+## 6. Documentation map
 
 Read in this order:
 
@@ -114,11 +130,11 @@ Read in this order:
 7. `07_WEB_AND_MOBILE_BUILD_SPEC.md` — Next.js/Vercel Web plus unified Flutter Android/iOS build specification.
 8. `08_SECURITY_RELIABILITY_RELEASE.md` — Firebase rules, secrets, payments, privacy, reliability and release gates.
 9. `09_IMPLEMENTATION_ROADMAP.md` — P0–P10 task breakdown and acceptance gates.
-10. `10_UI_DEMO_GALLERY.md` — approved mobile Driver/Customer and responsive Web visual references embedded from this repo.
+10. `10_LOCALIZATION_I18N.md` — Vietnamese-first bilingual localization contract.
 11. `PROJECT_STATUS.md` — durable progress ledger for AI/engineers.
 12. `AI_HANDOFF.md` — mandatory working rules/read order for another AI or engineer continuing the project.
 
-## 6. Non-negotiable engineering rules
+## 7. Non-negotiable engineering rules
 
 1. No production mock data.
 2. Never put Firebase Admin/service-account private keys, Stripe secret keys or other privileged credentials in Web/Flutter client code.
@@ -129,15 +145,6 @@ Read in this order:
 7. All writes involving money, rewards, verification, sensitive state transitions or notifications must be trusted/server-side where appropriate.
 8. Every phase must build and pass its defined verification before the next phase is marked complete.
 9. Do not auto-trigger costly CI from every commit unless explicitly approved. Prefer manual workflow dispatch for verification workflows.
-
-## 7. Approved UI concept assets
-
-Committed under `docs/unified-platform/assets/`:
-
-- `assets/web-mobile-overview.jpg` — mobile-first Customer + service workflows.
-- `assets/driver-mobile-overview.jpg` — Driver dashboard, new ride, active trip, delivery and intercity cargo workflows.
-- `assets/web-desktop-overview.jpg` — adaptive desktop presentation of the same product domains.
-
-Open `10_UI_DEMO_GALLERY.md` to view the images inline with a screen-by-screen functional explanation.
-
-These images are specification references, not literal pixel-perfect requirements or screenshots of finished production code. Implementation must preserve their information hierarchy, service coverage and interaction model while using production components, real Firebase data, accessibility and responsive behavior.
+10. Vietnamese is mandatory primary/default UI language; English is mandatory secondary language.
+11. A screen is not complete until both `vi` and `en` have passed functional/layout verification.
+12. UI implementation must follow `05_UI_UX_SPEC.md`; no image demo is treated as a source of truth.
