@@ -48,41 +48,35 @@ jobs:
             adb install -r uber_users_app/build/app/outputs/flutter-apk/app-debug.apk
             adb shell pm grant com.example.uber_users_app android.permission.ACCESS_FINE_LOCATION || true
             adb shell pm grant com.example.uber_users_app android.permission.ACCESS_COARSE_LOCATION || true
-
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
             adb shell am force-stop com.android.launcher3 || true
             adb shell am force-stop com.android.systemui || true
             sleep 2
             adb shell input keyevent KEYCODE_HOME || true
             sleep 1
-
             adb shell am force-stop com.example.uber_users_app
             adb shell monkey -p com.example.uber_users_app -c android.intent.category.LAUNCHER 1
             sleep 12
-
-            # Dismiss any system ANR/dialog overlay and foreground the app again.
-            for i in 1 2 3 4; do
-              adb shell input keyevent KEYCODE_BACK || true
-              sleep 1
-            done
+            adb shell input keyevent KEYCODE_BACK || true
+            sleep 1
+            adb shell input keyevent KEYCODE_BACK || true
+            sleep 1
+            adb shell input keyevent KEYCODE_BACK || true
+            sleep 1
+            adb shell input keyevent KEYCODE_BACK || true
+            sleep 1
             adb shell am start -n com.example.uber_users_app/.MainActivity || true
             sleep 5
             adb shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp' > logs/focus-home.txt || true
             adb exec-out screencap -p > user-screens/01-user-home.png
-
-            # Profile tab
             adb shell input tap 540 2220 || true
             sleep 3
             adb shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp' > logs/focus-profile.txt || true
             adb exec-out screencap -p > user-screens/02-user-profile.png
-
-            # About tab
             adb shell input tap 900 2220 || true
             sleep 3
             adb shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp' > logs/focus-about.txt || true
             adb exec-out screencap -p > user-screens/03-user-about.png
-
-            # Return Home and open the app drawer/menu if available.
             adb shell input tap 180 2220 || true
             sleep 2
             adb shell input tap 70 170 || true
@@ -90,12 +84,9 @@ jobs:
             adb exec-out screencap -p > user-screens/04-user-menu.png
             adb shell input keyevent KEYCODE_BACK || true
             sleep 1
-
-            # Capture destination area on Home.
             adb shell input tap 540 660 || true
             sleep 3
             adb exec-out screencap -p > user-screens/05-user-destination.png
-
             adb shell dumpsys activity activities > logs/activity.txt || true
             adb logcat -d -v threadtime > logs/user-logcat.txt || true
             adb shell pidof com.example.uber_users_app > logs/user-pid.txt || true
