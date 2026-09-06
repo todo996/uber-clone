@@ -1,8 +1,9 @@
-name: ChatGPT Android Build Preview
+name: ChatGPT Android Runtime Preview
 
 on:
   push:
-    branches: [master]
+    branches: [fix/android-runtime-preview]
+  workflow_dispatch:
 
 jobs:
   driver-screenshot:
@@ -21,33 +22,59 @@ jobs:
       - name: Dependencies
         working-directory: uber_drivers_app
         run: flutter pub get
+      - name: Analyze
+        working-directory: uber_drivers_app
+        run: flutter analyze || true
       - name: Build debug APK
         working-directory: uber_drivers_app
         run: flutter build apk --debug
-      - name: Run on Android emulator and capture real screen
+      - name: Enable Android emulator acceleration
+        run: |
+          if [ -e /dev/kvm ]; then
+            sudo chmod 666 /dev/kvm
+            ls -l /dev/kvm
+          else
+            echo '/dev/kvm is not available on this runner'
+          fi
+      - name: Run on Android emulator and capture app screens/logs
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
           arch: x86_64
           profile: pixel_6
           disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: |
-            mkdir -p screenshots
+            set -x
+            mkdir -p screenshots logs
+            adb wait-for-device
+            adb shell input keyevent 82 || true
+            adb shell settings put global window_animation_scale 0
+            adb shell settings put global transition_animation_scale 0
+            adb shell settings put global animator_duration_scale 0
             adb install -r uber_drivers_app/build/app/outputs/flutter-apk/app-debug.apk
+            adb logcat -c
             adb shell am force-stop com.example.uber_drivers_app
             adb shell monkey -p com.example.uber_drivers_app -c android.intent.category.LAUNCHER 1
-            sleep 12
+            sleep 8
+            adb shell input keyevent 4 || true
+            sleep 2
             adb exec-out screencap -p > screenshots/driver-launch.png
-            adb shell uiautomator dump /sdcard/window.xml || true
-            adb pull /sdcard/window.xml screenshots/driver-window.xml || true
+            adb shell dumpsys window windows > logs/window.txt || true
+            adb shell dumpsys activity activities > logs/activity.txt || true
+            adb logcat -d -v threadtime > logs/logcat.txt || true
+            adb shell pidof com.example.uber_drivers_app > logs/app-pid.txt || true
+            adb shell dumpsys package com.example.uber_drivers_app > logs/package.txt || true
       - uses: actions/upload-artifact@v4
         with:
-          name: driver-real-screenshots
-          path: screenshots/
+          name: driver-runtime-evidence
+          path: |
+            screenshots/
+            logs/
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
-          name: uber_drivers_app-debug-apk
+          name: uber_drivers_app-debug-apk-fixed-branch
           path: uber_drivers_app/build/app/outputs/flutter-apk/app-debug.apk
 
   user-build-preview:
@@ -76,5 +103,5 @@ jobs:
         run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:
-          name: uber_users_app-preview-debug-apk
+          name: uber_users_app-preview-debug-apk-fixed-branch
           path: uber_users_app/build/app/outputs/flutter-apk/app-debug.apk
