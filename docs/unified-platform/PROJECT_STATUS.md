@@ -10,8 +10,8 @@ feature/unified-platform-docs
 
 ## Overall state
 
-- Documentation: IN PROGRESS / INITIAL SPEC CREATED
-- Product code: NOT STARTED ON THIS BRANCH
+- Documentation: **INITIAL MASTER SPEC COMPLETE / READY FOR OWNER REVIEW**
+- Product code: **NOT STARTED ON THIS BRANCH**
 - `master`: intentionally untouched by this documentation work
 
 ## Approved product direction
@@ -30,38 +30,36 @@ feature/unified-platform-docs
 
 ## Documentation status
 
-- [x] Master specification
-- [x] Current code audit
-- [x] Product/feature catalog
-- [x] Target architecture
-- [x] Firebase data model
-- [x] UI/UX specification
-- [x] Service flows/business rules
-- [x] Web + Android/iOS build specification
-- [x] Security/reliability/release requirements
-- [x] P0–P10 roadmap
-- [ ] Final source-field inventory from every legacy Firebase write/read
-- [ ] Final admin compatibility inventory
-- [ ] Exact Firebase Rules implementation
-- [ ] Exact Firestore indexes generated from implementation queries
-- [ ] Final pricing policy values
-- [ ] Final cancellation/fee policy values
-- [ ] Final service-region configuration
+- [x] Master specification and read order.
+- [x] Current source-code audit.
+- [x] Product/feature catalog.
+- [x] Target project architecture.
+- [x] Firebase compatibility + new data model.
+- [x] Detailed UI/UX screen specification.
+- [x] Service state flows/business rules.
+- [x] Web + Android/iOS build specification.
+- [x] Security/reliability/release requirements.
+- [x] P0–P10 implementation roadmap.
+- [x] UI demo gallery embedded from committed repo assets.
+- [x] AI/engineer handoff instructions.
+- [ ] Final source-field inventory from every legacy Firebase read/write — P0 execution task.
+- [ ] Final admin compatibility inventory — P0 execution task.
+- [ ] Exact Firebase Rules implementation — implementation task.
+- [ ] Exact Firestore indexes generated from real implementation queries.
+- [ ] Final pricing policy values — owner/product configuration before production.
+- [ ] Final cancellation/fee policy values — owner/product configuration before production.
+- [ ] Final service-region configuration — owner/product configuration before production.
 
 ## UI concept asset status
 
-Target asset references:
+Approved assets committed to this branch:
 
-- [ ] `assets/web-desktop-overview.jpg`
-- [ ] `assets/web-mobile-overview.jpg`
-- [ ] `assets/user-driver-original-concept.jpg`
-- [ ] `assets/driver-dashboard.jpg`
-- [ ] `assets/driver-new-trip.jpg`
-- [ ] `assets/driver-active-trip.jpg`
-- [ ] `assets/driver-delivery.jpg`
-- [ ] `assets/driver-intercity-cargo.jpg`
+- [x] `assets/web-mobile-overview.jpg` — Customer + service mobile Web reference.
+- [x] `assets/driver-mobile-overview.jpg` — Driver mobile workflow reference.
+- [x] `assets/web-desktop-overview.jpg` — responsive desktop Web reference.
+- [x] `10_UI_DEMO_GALLERY.md` — inline gallery with screen/function mapping.
 
-Mark each item complete after the actual binary asset is committed to this branch.
+The concepts cover the previously approved individual Driver ideas (dashboard, request acceptance, active trip, delivery, intercity cargo) in one consolidated Driver reference so the documentation stays lightweight.
 
 ## Implementation phases
 
@@ -85,6 +83,18 @@ Mark each item complete after the actual binary asset is committed to this branc
 - [ ] Remove privileged service-account usage from client notification implementation.
 - [ ] Move Stripe secret/payment-intent creation to trusted server-side Firebase Function.
 - [ ] Review Firebase RTDB/Firestore/Storage rules before production.
+
+These are deliberately left unchecked because writing documentation does not revoke external Google Cloud credentials or change production security configuration.
+
+## Recommended implementation branch
+
+After owner review/approval, create a separate implementation branch from the approved documentation state:
+
+```text
+feature/unified-platform
+```
+
+Implementation should begin at P0, not directly at UI coding, because the legacy Firebase contracts and exposed-secret cleanup are release-critical dependencies.
 
 ## Agent update rules
 
