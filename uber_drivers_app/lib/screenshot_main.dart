@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_drivers_app/global/global.dart';
 import 'package:uber_drivers_app/pages/earnings/earning_page.dart';
+import 'package:uber_drivers_app/pages/home/home_page.dart';
 import 'package:uber_drivers_app/pages/profile/profile_page.dart';
 import 'package:uber_drivers_app/pages/trips/trips_page.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
@@ -13,7 +14,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  // Demo-only values for screenshots. Production main.dart is untouched.
   driverName = 'Demo';
   driverSecondName = 'Driver';
   driverPhone = '+92 300 1234567';
@@ -55,6 +55,7 @@ class _FunctionShowcaseState extends State<FunctionShowcase> {
   int index = 0;
 
   final pages = <Widget>[
+    const HomePage(),
     const EarningsPage(),
     TripsPage(),
     const ProfilePage(),
@@ -67,7 +68,9 @@ class _FunctionShowcaseState extends State<FunctionShowcase> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: index,
         onTap: (value) => setState(() => index = value),
+        type: BottomNavigationBarType.fixed,
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.credit_card), label: 'Earnings'),
           BottomNavigationBarItem(icon: Icon(Icons.account_tree), label: 'Trips'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
