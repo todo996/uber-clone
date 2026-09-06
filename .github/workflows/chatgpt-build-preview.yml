@@ -6,56 +6,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  driver-screenshot:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.5'
-          channel: stable
-          cache: true
-      - name: Dependencies
-        working-directory: uber_drivers_app
-        run: flutter pub get
-      - name: Build debug APK
-        working-directory: uber_drivers_app
-        run: flutter build apk --debug
-      - name: Enable Android emulator acceleration
-        run: |
-          if [ -e /dev/kvm ]; then sudo chmod 666 /dev/kvm; fi
-      - name: Capture auth screens
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          arch: x86_64
-          profile: pixel_6
-          disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: |
-            mkdir -p screenshots
-            adb wait-for-device
-            adb install -r uber_drivers_app/build/app/outputs/flutter-apk/app-debug.apk
-            adb shell pm grant com.example.uber_drivers_app android.permission.POST_NOTIFICATIONS || true
-            adb shell pm grant com.example.uber_drivers_app android.permission.ACCESS_FINE_LOCATION || true
-            adb shell pm grant com.example.uber_drivers_app android.permission.ACCESS_COARSE_LOCATION || true
-            adb shell am force-stop com.example.uber_drivers_app
-            adb shell monkey -p com.example.uber_drivers_app -c android.intent.category.LAUNCHER 1
-            sleep 8
-            adb exec-out screencap -p > screenshots/01-driver-register.png
-            adb shell input tap 540 420 || true
-            adb shell input text 5551234567 || true
-            sleep 2
-            adb exec-out screencap -p > screenshots/02-driver-phone-entered.png
-      - uses: actions/upload-artifact@v4
-        with:
-          name: driver-auth-real-screenshots
-          path: screenshots/
-
   driver-function-screenshots:
     runs-on: ubuntu-22.04
     steps:
@@ -72,13 +22,13 @@ jobs:
       - name: Dependencies
         working-directory: uber_drivers_app
         run: flutter pub get
-      - name: Build showcase APK from real app widgets
+      - name: Build demo APK from real app widgets
         working-directory: uber_drivers_app
-        run: flutter build apk --debug -t lib/screenshot_main.dart
+        run: flutter build apk --debug -t lib/screenshot_main.dart --dart-define=DEMO_MODE=true
       - name: Enable Android emulator acceleration
         run: |
           if [ -e /dev/kvm ]; then sudo chmod 666 /dev/kvm; fi
-      - name: Capture Earnings Trips Profile screens
+      - name: Capture Home Earnings Trips Profile screens
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -88,26 +38,39 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: |
             set -x
-            mkdir -p function-screens logs
+            mkdir -p demo-screens logs
             adb wait-for-device
             adb install -r uber_drivers_app/build/app/outputs/flutter-apk/app-debug.apk
             adb shell am force-stop com.example.uber_drivers_app
             adb shell monkey -p com.example.uber_drivers_app -c android.intent.category.LAUNCHER 1
-            sleep 8
-            adb exec-out screencap -p > function-screens/01-earnings.png
-            adb shell input tap 540 2220 || true
-            sleep 4
-            adb exec-out screencap -p > function-screens/02-trips.png
-            adb shell input tap 900 2220 || true
-            sleep 4
-            adb exec-out screencap -p > function-screens/03-profile.png
-            adb logcat -d -v threadtime > logs/showcase-logcat.txt || true
-            adb shell pidof com.example.uber_drivers_app > logs/showcase-pid.txt || true
+            sleep 10
+
+            adb exec-out screencap -p > demo-screens/01-home.png
+            adb shell input tap 540 145 || true
+            sleep 2
+            adb exec-out screencap -p > demo-screens/02-go-online-dialog.png
+            adb shell input keyevent 4 || true
+            sleep 1
+
+            adb shell input tap 405 2220 || true
+            sleep 3
+            adb exec-out screencap -p > demo-screens/03-earnings.png
+
+            adb shell input tap 675 2220 || true
+            sleep 3
+            adb exec-out screencap -p > demo-screens/04-trips.png
+
+            adb shell input tap 945 2220 || true
+            sleep 3
+            adb exec-out screencap -p > demo-screens/05-profile.png
+
+            adb logcat -d -v threadtime > logs/demo-logcat.txt || true
+            adb shell pidof com.example.uber_drivers_app > logs/demo-pid.txt || true
       - uses: actions/upload-artifact@v4
         with:
-          name: driver-function-real-widget-screenshots
+          name: driver-demo-full-real-screenshots
           path: |
-            function-screens/
+            demo-screens/
             logs/
           if-no-files-found: error
 
