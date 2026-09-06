@@ -40,7 +40,7 @@ Do not preserve an insecure legacy implementation merely because it exists in co
 - Keep Firebase access behind repositories/adapters.
 - Keep business state transitions outside UI widgets/components.
 - Keep privileged secrets server-side.
-- **Vietnamese (`vi`) is the primary/default language; English (`en`) is mandatory secondary language.**
+- Vietnamese (`vi`) is the primary/default language; English (`en`) is mandatory secondary language.
 - All user-facing strings must use the localization layer. Do not hardcode UI copy directly in components/widgets.
 - Missing localization keys must fall back to Vietnamese.
 
@@ -85,7 +85,7 @@ Modernize UX but do not accidentally drop verification fields.
 
 ## 6. UI policy
 
-Use approved images in `docs/unified-platform/assets/` only as visual and information-hierarchy references.
+There are no required demo images. `05_UI_UX_SPEC.md` is the UI source of truth.
 
 The actual implementation must:
 
@@ -98,6 +98,7 @@ The actual implementation must:
 - survive English text expansion without clipping
 - have accessible touch targets
 - preserve role/service clarity
+- follow the defined information hierarchy and state-driven interaction rules in the text specification
 
 Language switching must not reset authentication, active trip/order state, map state, or Driver online state.
 
@@ -139,9 +140,7 @@ Do not trigger expensive CI/emulator jobs automatically unless explicitly approv
 
 ## 9. Definition of a complete screen
 
-A screen is not complete if it only matches the concept visually.
-
-A complete screen includes:
+A screen is complete only when it includes:
 
 - navigation
 - real data
