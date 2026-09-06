@@ -1,0 +1,35 @@
+name: ChatGPT Android Build Preview
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [uber_users_app, uber_drivers_app]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Flutter version
+        run: flutter --version
+      - name: Dependencies
+        working-directory: ${{ matrix.app }}
+        run: flutter pub get
+      - name: Analyze
+        working-directory: ${{ matrix.app }}
+        run: flutter analyze || true
+      - name: Build debug APK
+        working-directory: ${{ matrix.app }}
+        run: flutter build apk --debug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-debug-apk
+          path: ${{ matrix.app }}/build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
