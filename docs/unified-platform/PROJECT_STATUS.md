@@ -27,6 +27,8 @@ feature/unified-platform-docs
 - [x] Add intercity cargo matching for cars and trucks.
 - [x] Add Driver dashboard and service-specific workflows.
 - [x] Keep legacy apps as references until migration passes.
+- [x] Vietnamese (`vi`) is the primary/default language.
+- [x] English (`en`) is the mandatory secondary language.
 - [x] Do not use demo images as a source of truth; UI is specified in text and component/screen requirements.
 
 ## Documentation status
@@ -36,12 +38,12 @@ feature/unified-platform-docs
 - [x] Product/feature catalog.
 - [x] Target project architecture.
 - [x] Firebase compatibility + new data model.
-- [x] Detailed UI/UX screen specification.
+- [x] Detailed text-only UI/UX screen specification.
 - [x] Service state flows/business rules.
 - [x] Web + Android/iOS build specification.
 - [x] Security/reliability/release requirements.
 - [x] P0–P10 implementation roadmap.
-- [x] Localization/i18n specification.
+- [x] Vietnamese-first bilingual localization/i18n specification.
 - [x] AI/engineer handoff instructions.
 - [ ] Final source-field inventory from every legacy Firebase read/write — P0 execution task.
 - [ ] Final admin compatibility inventory — P0 execution task.
@@ -57,6 +59,20 @@ feature/unified-platform-docs
 - `05_UI_UX_SPEC.md` is the UI/UX source of truth.
 - Actual legacy User/Driver source remains the behavioral reference for existing flows.
 - Production UI must be verified from the running Web/Android/iOS builds rather than static demo artwork.
+
+## Language policy
+
+```text
+Default/fallback: vi
+Secondary: en
+```
+
+A released screen is not complete until:
+
+- Vietnamese copy is complete.
+- English translation is complete.
+- both locales fit the responsive layout.
+- switching language does not reset active Customer/Driver state.
 
 ## Implementation phases
 
