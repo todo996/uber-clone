@@ -27,6 +27,7 @@ feature/unified-platform-docs
 - [x] Add intercity cargo matching for cars and trucks.
 - [x] Add Driver dashboard and service-specific workflows.
 - [x] Keep legacy apps as references until migration passes.
+- [x] Do not use demo images as a source of truth; UI is specified in text and component/screen requirements.
 
 ## Documentation status
 
@@ -40,7 +41,7 @@ feature/unified-platform-docs
 - [x] Web + Android/iOS build specification.
 - [x] Security/reliability/release requirements.
 - [x] P0–P10 implementation roadmap.
-- [x] UI demo gallery embedded from committed repo assets.
+- [x] Localization/i18n specification.
 - [x] AI/engineer handoff instructions.
 - [ ] Final source-field inventory from every legacy Firebase read/write — P0 execution task.
 - [ ] Final admin compatibility inventory — P0 execution task.
@@ -50,16 +51,12 @@ feature/unified-platform-docs
 - [ ] Final cancellation/fee policy values — owner/product configuration before production.
 - [ ] Final service-region configuration — owner/product configuration before production.
 
-## UI concept asset status
+## UI reference policy
 
-Approved assets committed to this branch:
-
-- [x] `assets/web-mobile-overview.jpg` — Customer + service mobile Web reference.
-- [x] `assets/driver-mobile-overview.jpg` — Driver mobile workflow reference.
-- [x] `assets/web-desktop-overview.jpg` — responsive desktop Web reference.
-- [x] `10_UI_DEMO_GALLERY.md` — inline gallery with screen/function mapping.
-
-The concepts cover the previously approved individual Driver ideas (dashboard, request acceptance, active trip, delivery, intercity cargo) in one consolidated Driver reference so the documentation stays lightweight.
+- Demo images have been removed from this branch.
+- `05_UI_UX_SPEC.md` is the UI/UX source of truth.
+- Actual legacy User/Driver source remains the behavioral reference for existing flows.
+- Production UI must be verified from the running Web/Android/iOS builds rather than static demo artwork.
 
 ## Implementation phases
 
