@@ -10,12 +10,14 @@ The finished product must ship as:
    - combines Customer + Driver
    - deploys to Vercel
    - PWA installable
+   - Vietnamese default + English secondary
 
 2. **One Unified Mobile App codebase**
    - Flutter
    - builds Android APK/AAB
    - builds iOS IPA/App Store archive
    - combines Customer + Driver
+   - Vietnamese default + English secondary
 
 The old separate User and Driver Flutter applications remain reference clients during migration.
 
@@ -31,6 +33,7 @@ The old separate User and Driver Flutter applications remain reference clients d
 - Google Maps JS integration
 - PWA manifest + service worker
 - Vercel-compatible build
+- structured i18n resources for `vi` and `en`
 
 ### Required web routes
 
@@ -79,6 +82,7 @@ Separate:
 
 - auth/session state
 - active mode
+- locale preference
 - active booking/order state
 - map/geolocation state
 - ephemeral UI state
@@ -108,6 +112,7 @@ Minimum:
 - cache static assets
 - do not cache private realtime data as public shared cache
 - push notification support where browser/platform permits
+- localized install/app metadata where supported
 
 ### Vercel
 
@@ -159,6 +164,8 @@ Suggested logical routes:
 - Google Maps key configured securely per platform
 - Firebase google-services config
 - release signing through CI/local secure secrets, never committed
+- Vietnamese and English localization resources
+- Vietnamese default app language/fallback
 
 ### iOS requirements
 
@@ -170,12 +177,16 @@ Suggested logical routes:
 - Firebase GoogleService-Info config management
 - Maps key/config
 - release signing/provisioning outside source control
+- Vietnamese and English localization resources
+- Vietnamese default app language/fallback
 
 ## 4. Shared feature parity matrix
 
 | Feature | Web Customer | Web Driver | Mobile Customer | Mobile Driver |
 |---|---:|---:|---:|---:|
 | Auth/Profile | Yes | Yes | Yes | Yes |
+| Vietnamese UI | Yes | Yes | Yes | Yes |
+| English UI | Yes | Yes | Yes | Yes |
 | Standard ride | Yes | Yes | Yes | Yes |
 | Scheduled ride | Yes | Yes | Yes | Yes |
 | Shared ride | Yes | Yes | Yes | Yes |
@@ -198,6 +209,8 @@ The apps share:
 - information hierarchy
 - primary action semantics
 - validation and business rules
+- Vietnamese canonical product copy
+- English equivalent copy
 
 They do not need identical layout code.
 
@@ -255,7 +268,7 @@ Map UI should call a domain/map service rather than repeat route decoding logic 
 All forms require:
 
 - schema validation
-- inline error messages
+- localized inline error messages
 - disabled submit while invalid/submitting
 - idempotent submission behavior
 - upload progress for photos/documents
@@ -273,9 +286,26 @@ Critical forms:
 
 ## 9. Localization
 
-Primary language for first release: Vietnamese.
+Localization is a first-release requirement, not a future enhancement.
 
-Architecture should keep strings outside business logic so English/other languages can be added later.
+Mandatory locales:
+
+```text
+vi  # primary/default/fallback
+en  # secondary
+```
+
+Rules:
+
+- Vietnamese is the canonical product wording for the initial Vietnam release.
+- English must exist for every released user-facing string.
+- Clean install/session defaults to Vietnamese.
+- Locale preference persists across refresh/restart and, when authenticated, should be associated with the user's preference.
+- Language switch must not reset active Customer/Driver workflows.
+- Machine state values in Firebase are never translated.
+- Validation/error codes map to locale resources rather than raw provider messages.
+- Web and Flutter builds must run translation-key parity checks.
+- Full contract is defined in `10_LOCALIZATION_I18N.md`.
 
 ## 10. Testing pyramid
 
@@ -287,6 +317,7 @@ Architecture should keep strings outside business logic so English/other languag
 - capacity math
 - validation
 - adapters/mappers
+- locale fallback and formatter utilities
 
 ### Integration
 
@@ -296,6 +327,7 @@ Architecture should keep strings outside business logic so English/other languag
 - shared seat reservation
 - cargo capacity reservation
 - scheduled activation
+- locale preference persistence
 
 ### UI/component
 
@@ -304,6 +336,7 @@ Architecture should keep strings outside business logic so English/other languag
 - request cards
 - status timelines
 - role switching
+- `vi` and `en` layout checks
 
 ### End-to-end
 
@@ -315,6 +348,7 @@ Critical journeys:
 4. Delivery → pickup proof → delivery proof.
 5. Cargo post → route match → capacity reservation → delivery.
 6. Driver onboarding → approval state.
+7. Switch `vi -> en -> vi` without losing session or active-service state.
 
 ## 11. Build commands — target
 
@@ -327,6 +361,7 @@ install
 lint
 typecheck
 test
+i18n-check
 build
 ```
 
@@ -334,6 +369,7 @@ build
 
 ```text
 flutter pub get
+flutter gen-l10n
 flutter analyze
 flutter test
 flutter build apk
@@ -347,7 +383,7 @@ Given build/emulator workflows can consume meaningful quota:
 
 - verification workflow should support `workflow_dispatch`
 - do not automatically run expensive emulator/screenshot jobs on every commit unless explicitly approved
-- lightweight lint/typecheck may be separated from costly build jobs
+- lightweight lint/typecheck/i18n checks may be separated from costly build jobs
 - manual release workflows for production artifacts
 
 ## 13. Definition of done for clients
@@ -361,6 +397,9 @@ Done requires:
 - validation
 - permission handling
 - reconnect recovery
+- Vietnamese primary copy
+- complete English translation
+- locale persistence
 - tests
 - responsive behavior
 - no mock production data
