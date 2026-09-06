@@ -103,18 +103,20 @@ Do not delete or restructure the legacy apps until the new clients pass compatib
 
 ## 5. Documentation map
 
-- `01_CURRENT_CODE_AUDIT.md` — what exists and what is reusable.
-- `02_PRODUCT_AND_FEATURE_SPEC.md` — complete feature catalog and business rules.
-- `03_ARCHITECTURE.md` — professional target architecture.
-- `04_FIREBASE_DATA_MODEL.md` — legacy compatibility + new data model.
-- `05_UI_UX_SPEC.md` — UI system and every main User/Driver screen.
-- `06_RIDE_AND_SHARED_RIDE.md` — standard ride, scheduling and shared ride.
-- `07_DELIVERY_AND_INTERCITY_CARGO.md` — delivery and cargo matching.
-- `08_WEB_AND_MOBILE_BUILD_SPEC.md` — Next.js web + Flutter Android/iOS requirements.
-- `09_SECURITY_RELIABILITY_RELEASE.md` — security, Firebase rules, payments, notifications, testing.
-- `10_IMPLEMENTATION_ROADMAP.md` — P0–P10 implementation tasks and acceptance gates.
-- `PROJECT_STATUS.md` — durable progress ledger for AI agents.
-- `assets/` — approved UI concept images.
+Read in this order:
+
+1. `01_CURRENT_CODE_AUDIT.md` — actual User/Driver source audit and reusable legacy contracts.
+2. `02_PRODUCT_AND_FEATURE_SPEC.md` — complete Customer/Driver feature catalog and business rules.
+3. `03_ARCHITECTURE.md` — professional target architecture for Firebase + Web + Mobile.
+4. `04_FIREBASE_DATA_MODEL.md` — legacy compatibility, normalized new domains and capacity invariants.
+5. `05_UI_UX_SPEC.md` — design system and detailed specification for every major Customer/Driver screen.
+6. `06_SERVICE_FLOWS.md` — standard ride, scheduling, shared ride, delivery and intercity cargo state flows.
+7. `07_WEB_AND_MOBILE_BUILD_SPEC.md` — Next.js/Vercel Web plus unified Flutter Android/iOS build specification.
+8. `08_SECURITY_RELIABILITY_RELEASE.md` — Firebase rules, secrets, payments, privacy, reliability and release gates.
+9. `09_IMPLEMENTATION_ROADMAP.md` — P0–P10 task breakdown and acceptance gates.
+10. `10_UI_DEMO_GALLERY.md` — approved mobile Driver/Customer and responsive Web visual references embedded from this repo.
+11. `PROJECT_STATUS.md` — durable progress ledger for AI/engineers.
+12. `AI_HANDOFF.md` — mandatory working rules/read order for another AI or engineer continuing the project.
 
 ## 6. Non-negotiable engineering rules
 
@@ -128,17 +130,14 @@ Do not delete or restructure the legacy apps until the new clients pass compatib
 8. Every phase must build and pass its defined verification before the next phase is marked complete.
 9. Do not auto-trigger costly CI from every commit unless explicitly approved. Prefer manual workflow dispatch for verification workflows.
 
-## 7. UI concept assets
+## 7. Approved UI concept assets
 
-The following images are specification references, not literal pixel-perfect requirements:
+Committed under `docs/unified-platform/assets/`:
 
-- `assets/web-desktop-overview.jpg`
-- `assets/web-mobile-overview.jpg`
-- `assets/user-driver-original-concept.jpg`
-- `assets/driver-dashboard.jpg`
-- `assets/driver-new-trip.jpg`
-- `assets/driver-active-trip.jpg`
-- `assets/driver-delivery.jpg`
-- `assets/driver-intercity-cargo.jpg`
+- `assets/web-mobile-overview.jpg` — mobile-first Customer + service workflows.
+- `assets/driver-mobile-overview.jpg` — Driver dashboard, new ride, active trip, delivery and intercity cargo workflows.
+- `assets/web-desktop-overview.jpg` — adaptive desktop presentation of the same product domains.
 
-Implementation must preserve the information hierarchy, service coverage and interaction model shown by these concepts while using production components, real Firebase data and responsive behavior.
+Open `10_UI_DEMO_GALLERY.md` to view the images inline with a screen-by-screen functional explanation.
+
+These images are specification references, not literal pixel-perfect requirements or screenshots of finished production code. Implementation must preserve their information hierarchy, service coverage and interaction model while using production components, real Firebase data, accessibility and responsive behavior.
