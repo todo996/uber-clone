@@ -30,13 +30,8 @@ jobs:
         run: flutter build apk --debug
       - name: Enable Android emulator acceleration
         run: |
-          if [ -e /dev/kvm ]; then
-            sudo chmod 666 /dev/kvm
-            ls -l /dev/kvm
-          else
-            echo '/dev/kvm is not available on this runner'
-          fi
-      - name: Run on Android emulator and capture app screens/logs
+          if [ -e /dev/kvm ]; then sudo chmod 666 /dev/kvm; fi
+      - name: Run on Android emulator and capture multiple real screens
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -48,26 +43,42 @@ jobs:
             set -x
             mkdir -p screenshots logs
             adb wait-for-device
-            adb shell input keyevent 82 || true
-            adb shell settings put global window_animation_scale 0
-            adb shell settings put global transition_animation_scale 0
-            adb shell settings put global animator_duration_scale 0
             adb install -r uber_drivers_app/build/app/outputs/flutter-apk/app-debug.apk
+            adb shell pm grant com.example.uber_drivers_app android.permission.POST_NOTIFICATIONS || true
+            adb shell pm grant com.example.uber_drivers_app android.permission.ACCESS_FINE_LOCATION || true
+            adb shell pm grant com.example.uber_drivers_app android.permission.ACCESS_COARSE_LOCATION || true
             adb logcat -c
             adb shell am force-stop com.example.uber_drivers_app
             adb shell monkey -p com.example.uber_drivers_app -c android.intent.category.LAUNCHER 1
             sleep 8
-            adb shell input keyevent 4 || true
+            adb exec-out screencap -p > screenshots/01-driver-register.png
+            adb shell uiautomator dump /sdcard/ui01.xml || true
+            adb pull /sdcard/ui01.xml logs/ui01.xml || true
+
+            # Tap phone field, enter a safe dummy number, capture keyboard/form state.
+            adb shell input tap 540 420 || true
+            adb shell input text 5551234567 || true
             sleep 2
-            adb exec-out screencap -p > screenshots/driver-launch.png
-            adb shell dumpsys window windows > logs/window.txt || true
+            adb exec-out screencap -p > screenshots/02-driver-phone-entered.png
+            adb shell input keyevent 4 || true
+            sleep 1
+
+            # Scroll through the registration form and capture additional real UI states.
+            adb shell input swipe 540 1700 540 500 500 || true
+            sleep 2
+            adb exec-out screencap -p > screenshots/03-driver-register-scrolled.png
+            adb shell input swipe 540 1700 540 500 500 || true
+            sleep 2
+            adb exec-out screencap -p > screenshots/04-driver-register-bottom.png
+
+            adb shell uiautomator dump /sdcard/ui-final.xml || true
+            adb pull /sdcard/ui-final.xml logs/ui-final.xml || true
             adb shell dumpsys activity activities > logs/activity.txt || true
             adb logcat -d -v threadtime > logs/logcat.txt || true
             adb shell pidof com.example.uber_drivers_app > logs/app-pid.txt || true
-            adb shell dumpsys package com.example.uber_drivers_app > logs/package.txt || true
       - uses: actions/upload-artifact@v4
         with:
-          name: driver-runtime-evidence
+          name: driver-multiple-real-screenshots
           path: |
             screenshots/
             logs/
