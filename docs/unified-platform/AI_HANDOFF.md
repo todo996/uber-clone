@@ -14,7 +14,8 @@ Every implementation agent must read, in this order:
 8. `07_WEB_AND_MOBILE_BUILD_SPEC.md`
 9. `08_SECURITY_RELIABILITY_RELEASE.md`
 10. `09_IMPLEMENTATION_ROADMAP.md`
-11. `PROJECT_STATUS.md`
+11. `10_LOCALIZATION_I18N.md`
+12. `PROJECT_STATUS.md`
 
 Then inspect the actual legacy source for the phase being implemented.
 
@@ -39,6 +40,9 @@ Do not preserve an insecure legacy implementation merely because it exists in co
 - Keep Firebase access behind repositories/adapters.
 - Keep business state transitions outside UI widgets/components.
 - Keep privileged secrets server-side.
+- **Vietnamese (`vi`) is the primary/default language; English (`en`) is mandatory secondary language.**
+- All user-facing strings must use the localization layer. Do not hardcode UI copy directly in components/widgets.
+- Missing localization keys must fall back to Vietnamese.
 
 ## 4. Legacy compatibility requirement
 
@@ -57,6 +61,8 @@ Current compatibility behaviors include:
 - states `new`, `accepted`, `arrived`, `ontrip`, `ended`
 
 New normalized domain states must map through an adapter while legacy clients remain supported.
+
+Machine states remain language-neutral. Never write Vietnamese or English display strings as Firebase state values.
 
 ## 5. Driver onboarding reference
 
@@ -86,9 +92,14 @@ The actual implementation must:
 - use real Firebase state
 - be responsive
 - have loading/error/empty states
-- support Vietnamese text cleanly
+- use Vietnamese as default product copy
+- provide complete English equivalents
+- render Vietnamese diacritics cleanly
+- survive English text expansion without clipping
 - have accessible touch targets
 - preserve role/service clarity
+
+Language switching must not reset authentication, active trip/order state, map state, or Driver online state.
 
 ## 7. Phase workflow
 
@@ -97,11 +108,12 @@ For each phase:
 1. Mark phase `IN PROGRESS` in `PROJECT_STATUS.md`.
 2. Audit relevant legacy files.
 3. Implement smallest complete vertical slice.
-4. Run required tests/builds.
-5. Fix until green.
-6. Update docs if implementation reveals a contract change.
-7. Mark `READY FOR MANUAL VERIFY` when owner verification is required.
-8. Only mark `PASS` after phase gate is satisfied.
+4. Implement Vietnamese copy and English translation for that slice.
+5. Run required tests/builds in both locales where UI is involved.
+6. Fix until green.
+7. Update docs if implementation reveals a contract change.
+8. Mark `READY FOR MANUAL VERIFY` when owner verification is required.
+9. Only mark `PASS` after phase gate is satisfied.
 
 ## 8. Build discipline
 
@@ -112,12 +124,14 @@ Web checks:
 - typecheck
 - test
 - production build
+- localization-key parity check (`vi` and `en`)
 
 Mobile checks:
 
 - `flutter pub get`
 - `flutter analyze`
 - `flutter test`
+- localization generation/check
 - Android build
 - iOS compile check where environment supports it
 
@@ -138,6 +152,9 @@ A complete screen includes:
 - error state
 - realtime behavior where applicable
 - responsive/adaptive behavior
+- Vietnamese primary copy
+- English translation
+- no missing localization keys
 - test coverage appropriate to risk
 
 ## 10. Stop conditions
@@ -153,3 +170,6 @@ Do not merge/release when any of these remain:
 - overbookable seat/cargo capacity
 - role verification bypass
 - unrecoverable active trip after restart
+- missing Vietnamese production copy
+- missing English translation for a released screen
+- hardcoded user-facing strings that bypass i18n
