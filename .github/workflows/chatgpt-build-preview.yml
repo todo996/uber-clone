@@ -71,20 +71,18 @@ jobs:
             adb exec-out screencap -p > user-screens/01-user-home.png
             adb shell input tap 540 2220 || true
             sleep 3
-            adb shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp' > logs/focus-profile.txt || true
             adb exec-out screencap -p > user-screens/02-user-profile.png
             adb shell input tap 900 2220 || true
             sleep 3
-            adb shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp' > logs/focus-about.txt || true
             adb exec-out screencap -p > user-screens/03-user-about.png
             adb shell input tap 180 2220 || true
             sleep 2
-            adb shell input tap 70 170 || true
-            sleep 2
+            adb shell input tap 130 255 || true
+            sleep 3
             adb exec-out screencap -p > user-screens/04-user-menu.png
             adb shell input keyevent KEYCODE_BACK || true
-            sleep 1
-            adb shell input tap 540 660 || true
+            sleep 2
+            adb shell input tap 540 1985 || true
             sleep 3
             adb exec-out screencap -p > user-screens/05-user-destination.png
             adb shell dumpsys activity activities > logs/activity.txt || true
@@ -92,7 +90,7 @@ jobs:
             adb shell pidof com.example.uber_users_app > logs/user-pid.txt || true
       - uses: actions/upload-artifact@v4
         with:
-          name: user-app-clean-real-screenshots
+          name: user-app-five-real-screenshots
           path: |
             user-screens/
             logs/
