@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:uber_users_app/appInfo/app_info.dart';
 import 'package:uber_users_app/appInfo/auth_provider.dart';
 import 'package:uber_users_app/global/global_var.dart';
+import 'package:uber_users_app/models/address_models.dart';
 import 'package:uber_users_app/pages/about_page.dart';
 import 'package:uber_users_app/pages/home_page.dart';
 import 'package:uber_users_app/pages/profile_page.dart';
@@ -27,7 +28,21 @@ class UserScreenshotApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AppInfoClass()),
+        ChangeNotifierProvider(
+          create: (_) {
+            final appInfo = AppInfoClass();
+            appInfo.updatePickUpLocation(
+              AddressModel(
+                humanReadableAddress: 'Demo pickup location',
+                placeName: 'Demo pickup location',
+                latitudePosition: 10.7769,
+                longitudePosition: 106.7009,
+                placeID: 'demo-pickup',
+              ),
+            );
+            return appInfo;
+          },
+        ),
         ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
       ],
       child: MaterialApp(
